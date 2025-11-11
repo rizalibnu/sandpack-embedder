@@ -1,0 +1,21 @@
+{
+  "name": "@rizalibnu/sandpack-embedder",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "include": [
+    "src/**/*.ts",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/tests",
+    "src/stories",
+    "**/*.stories.(ts|tsx|js|jsx)",
+    "**/*.test.(ts|tsx|js|jsx)"
+  ]
+}
