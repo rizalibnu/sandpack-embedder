@@ -54,7 +54,7 @@ interface SandpackConfig {
   >;
 }
 
-export default class SandpackEmbedder {
+export class SandpackEmbedder {
   private readonly codeSelector: string;
   private readonly codeContainerSelector: string;
   private readonly filePathSelector: string;
