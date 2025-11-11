@@ -1,6 +1,7 @@
 {
   "branches": ["master"],
   "repositoryUrl": "https://github.com/rizalibnu/sandpack-embedder",
+  "tagFormat": "v${version}",
   "plugins": [
     [
       "@semantic-release/commit-analyzer",
@@ -35,12 +36,14 @@
     "@semantic-release/changelog",
     "@semantic-release/npm",
     "@semantic-release/git",
-    "@semantic-release/github"
+    "@semantic-release/github",
+    "@sebbo2002/semantic-release-jsr"
   ],
   "prepare": [
     "@semantic-release/changelog",
     "@semantic-release/npm",
-    "@semantic-release/git"
+    "@semantic-release/git",
+    "@sebbo2002/semantic-release-jsr"
   ],
   "publish": [
     "@semantic-release/npm",
