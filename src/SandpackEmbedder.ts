@@ -59,7 +59,7 @@ export default class SandpackEmbedder {
   private readonly codeContainerSelector: string;
   private readonly filePathSelector: string;
   private readonly playgroundContainerClass: string;
-  private readonly configFilePath: string;
+  private readonly configFilePath: string | null;
   private readonly CustomSandpack?: React.ComponentType<SandpackProps>;
   private readonly initialTheme?: SandpackProps["theme"];
   private initialized = false;
@@ -201,7 +201,7 @@ export default class SandpackEmbedder {
       const codeContainerEl = block.closest(codeContainerSelector) as HTMLElement | null;
       if (!codeContainerEl) return;
 
-      let filePath = codeContainerEl.querySelector(filePathSelector)?.textContent?.trim();
+      let filePath = codeContainerEl.querySelector(filePathSelector)?.textContent?.trim() ?? null;
       filePath = SandpackEmbedder.normalizeFilePath(filePath);
       const isConfigFile = filePath === configFilePath;
 
