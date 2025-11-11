@@ -5,7 +5,7 @@
   "imports": {
     "react": "npm:react@19.2.0",
     "react-dom": "npm:react-dom@19.2.0",
-    "@codesandbox/sandpack-react": "https://esm.sh/@codesandbox/sandpack-react@2.20.0"
+    "@codesandbox/sandpack-react": "npm:@codesandbox/sandpack-react@2.20.0"
   },
   "exports": "./src/index.ts",
   "include": [
