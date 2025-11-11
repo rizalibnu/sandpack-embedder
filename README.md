@@ -33,18 +33,8 @@ You can use `SandpackEmbedder` on **any web page** that includes HTML code block
   <span class="file-path">/index.js</span>
 </div>
 
-<script type="importmap">
-  {
-    "imports": {
-      "react": "https://esm.sh/react@19.2.0",
-      "react-dom/client": "https://esm.sh/react-dom@19.2.0/client",
-      "@codesandbox/sandpack-react": "https://esm.sh/@codesandbox/sandpack-react@2.20.0",
-      "@rizalibnu/sandpack-embedder": "https://esm.sh/@rizalibnu/sandpack-embedder"
-    }
-  }
-</script>
 <script type="module">
-  import SandpackEmbedder from "@rizalibnu/sandpack-embedder";
+  import SandpackEmbedder from "https://esm.sh/@rizalibnu/sandpack-embedder";
 
   const embedder = new SandpackEmbedder({
     codeSelector: ".code-sandpack",
