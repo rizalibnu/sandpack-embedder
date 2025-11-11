@@ -84,5 +84,8 @@
     "branches": [
       "master"
     ]
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
