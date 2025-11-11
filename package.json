@@ -10,7 +10,7 @@
     "ghost code playground"
   ],
   "author": "Rizal Ibnu",
-  "license": "ISC",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/rizalibnu/sandpack-embedder"
