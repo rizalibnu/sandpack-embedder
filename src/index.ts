@@ -1,3 +1,3 @@
-import {SandpackEmbedder} from "./SandpackEmbedder.ts";
-export * from "./SandpackEmbedder.ts";
+import {SandpackEmbedder} from "./SandpackEmbedder";
+export * from "./SandpackEmbedder";
 export default SandpackEmbedder;
