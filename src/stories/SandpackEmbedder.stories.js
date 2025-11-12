@@ -1,15 +1,20 @@
-import { gruvboxDark } from "@codesandbox/sandpack-themes";
-import React from "react";
-import { Sandpack } from "@codesandbox/sandpack-react";
-import { SandpackEmbedder } from "../index";
-import { buildCodeBlock, CODE_CONTAINER_SELECTOR } from "../../utils";
+import React from 'react';
+import { gruvboxDark } from '@codesandbox/sandpack-themes';
+import { Sandpack } from '@codesandbox/sandpack-react';
+import { SandpackEmbedder } from '../index';
+import { buildSandpackBlock } from '../../utils';
 
 export default {
-  title: "SandpackEmbedder",
+  title: 'SandpackEmbedder',
 };
 
+/* -------------------------------------------------
+   Helper: Reset all sandpack DOMs
+-------------------------------------------------- */
 function resetBeforeStory() {
-  document.querySelectorAll(CODE_CONTAINER_SELECTOR).forEach((el) => el.remove());
+  document
+    .querySelectorAll('.sandpack-playground, .sandpack-container')
+    .forEach((el) => el.remove());
 }
 
 /* -------------------------------------------------
@@ -17,64 +22,65 @@ function resetBeforeStory() {
 -------------------------------------------------- */
 export const Basic = () => {
   resetBeforeStory();
-  const container = document.createElement("div");
-  container.innerHTML = `
-    ${buildCodeBlock(`{
-      "template": "react",
-      "options": { "editorHeight": "500px" }
-    }`, "sandpack.config.json")}
+  const container = document.createElement('div');
 
-    ${buildCodeBlock(`
-import React from "react";
-
-function App() {
+  container.innerHTML = buildSandpackBlock({
+    template: 'react',
+    files: {
+      '/App.js': {
+        code: `
+export default function App() {
   return <h2>Hello Sandpack Embedder 👋</h2>;
-}
-
-export default App;
-    `, "App.js")}
-  `;
+}`,
+        active: true,
+      },
+    },
+    options: { editorHeight: '400px' },
+  });
 
   document.body.appendChild(container);
 
-  const instance = new SandpackEmbedder({ theme: "dark" });
-  instance.load();
+  const embedder = new SandpackEmbedder({ theme: 'dark' });
+  embedder.load();
 
   return container;
 };
 
 /* -------------------------------------------------
-   Update Theme Dynamically
+   Dynamic Theme Update
 -------------------------------------------------- */
 export const UpdateTheme = () => {
   resetBeforeStory();
-  const container = document.createElement("div");
-  container.innerHTML = `
-    ${buildCodeBlock(`{
-      "template": "react"
-    }`, "sandpack.config.json")}
-    ${buildCodeBlock(`
+  const container = document.createElement('div');
+
+  container.innerHTML = buildSandpackBlock({
+    template: 'react',
+    files: {
+      '/App.js': {
+        code: `
 export default function App() {
   return <div>Dark / Light theme toggle test 🌗</div>;
-}`, "App.js")}
-  `;
+}`,
+        active: true,
+      },
+    },
+  });
 
   document.body.appendChild(container);
 
-  const instance = new SandpackEmbedder({ theme: "dark" });
-  instance.load();
+  const embedder = new SandpackEmbedder({ theme: 'dark' });
+  embedder.load();
 
-  // Add a theme toggle button
-  const button = document.createElement("button");
-  button.textContent = "Toggle Theme";
-  button.style.margin = "1rem";
+  const button = document.createElement('button');
+  button.textContent = 'Toggle Theme';
+  button.style.margin = '1rem';
+  button.dataset.theme = 'dark';
   button.onclick = () => {
-    const newTheme = button.dataset.theme === "dark" ? "light" : "dark";
-    instance.updateTheme(newTheme);
+    const newTheme = button.dataset.theme === 'dark' ? 'light' : 'dark';
+    embedder.updateTheme(newTheme);
     button.dataset.theme = newTheme;
-    button.textContent = `Switch to ${newTheme === "dark" ? "Light" : "Dark"} Theme`;
+    button.textContent = `Switch to ${newTheme === 'dark' ? 'Light' : 'Dark'} Theme`;
   };
-  button.dataset.theme = "dark";
 
   container.prepend(button);
 
@@ -82,90 +88,82 @@ export default function App() {
 };
 
 /* -------------------------------------------------
-   Without Config (auto-detect files only)
+   Custom Theme Example (GruvboxDark)
 -------------------------------------------------- */
-export const SandpackTheme = () => {
+export const CustomTheme = () => {
   resetBeforeStory();
-  const container = document.createElement("div");
+  const container = document.createElement('div');
 
-  container.innerHTML = `
-    ${buildCodeBlock(`{
-      "template": "vanilla"
-    }`, "sandpack.config.json")}
-    ${buildCodeBlock(`
-document.body.innerHTML = '<h2>Hello! I am using GruvboxDark theme</h2>';
-`, "index.js")}
-  `;
+  container.innerHTML = buildSandpackBlock({
+    template: 'vanilla',
+    files: {
+      '/index.js': {
+        code: `document.body.innerHTML = '<h2>Hello! I am using GruvboxDark theme</h2>';`,
+        active: true,
+      },
+    },
+  });
 
   document.body.appendChild(container);
 
-  const instance = new SandpackEmbedder({ theme: gruvboxDark });
-  instance.load();
+  const embedder = new SandpackEmbedder({ theme: gruvboxDark });
+  embedder.load();
 
   return container;
 };
 
 /* -------------------------------------------------
-   Story 3: Multiple Sections (Two Sandpacks in One Page)
+   Multiple Sandpack Sections
 -------------------------------------------------- */
 export const MultipleSections = () => {
   resetBeforeStory();
-  const container = document.createElement("div");
+  const container = document.createElement('div');
 
   container.innerHTML = `
-    ${buildCodeBlock(`{
-      "template": "react"
-    }`, "sandpack.config.json")}
-    ${buildCodeBlock(`
+    ${buildSandpackBlock({
+      template: 'react',
+      files: {
+        '/App.js': {
+          code: `
 export default function App() {
   return <h2>Section 1 - Hello!</h2>;
-}`, "App.js")}
-
-    <!-- Section Separator -->
+}`,
+          active: true,
+        },
+      },
+    })}
     <hr />
-
-    ${buildCodeBlock(`{
-      "template": "vanilla"
-    }`, "sandpack.config.json")}
-    ${buildCodeBlock(`
-document.body.innerHTML = '<h2>Section 2 - Vanilla JS</h2>';
-`, "index.js")}
+    ${buildSandpackBlock({
+      template: 'vanilla',
+      files: {
+        '/index.js': {
+          code: `document.body.innerHTML = '<h2>Section 2 - Vanilla JS</h2>';`,
+          active: true,
+        },
+      },
+    })}
   `;
 
   document.body.appendChild(container);
 
-  const instance = new SandpackEmbedder();
-  instance.load();
+  const embedder = new SandpackEmbedder();
+  embedder.load();
 
   return container;
 };
 
 /* -------------------------------------------------
-   With Config Files (multiple files + options)
+   Complex Config (Multiple Files)
 -------------------------------------------------- */
 export const WithConfigFiles = () => {
   resetBeforeStory();
-  const container = document.createElement("div");
-  container.style.margin = "2rem";
+  const container = document.createElement('div');
 
-  container.innerHTML = `
-    ${buildCodeBlock(`{
-      "files": {
-        "/App.js": {
-          "hidden": false,
-          "active": true,
-          "readOnly": false
-        },
-        "/components/Button.tsx": {},
-        "/Hello.tsx": {
-          "code": "export const Hello = () => <h1>Hello Sandpack Embedder</h1>;",
-          "readOnly": true
-        }
-      },
-      "template": "react"
-    }`, "sandpack.config.json")}
-
-    ${buildCodeBlock(`
+  container.innerHTML = buildSandpackBlock({
+    template: 'react',
+    files: {
+      '/App.js': {
+        code: `
 import React from "react";
 import { Hello } from "./Hello";
 import Button from "./components/Button";
@@ -179,72 +177,27 @@ export default function App() {
       <Button onClick={() => setText('Excellent! You clicked the button')} />
     </div>
   );
-}
-    `, "App.js")}
-
-    ${buildCodeBlock(`
+}`,
+        active: true,
+      },
+      '/components/Button.tsx': {
+        code: `
 import React from "react";
 
-const Button = (props) => {
-  return <button onClick={props.onClick}>Click Me!</button>;
-};
-
+const Button = (props) => <button onClick={props.onClick}>Click Me!</button>;
 export default Button;
-    `, "components/Button.tsx")}
-  `;
-
-  document.body.appendChild(container);
-
-  const instance = new SandpackEmbedder();
-  instance.load();
-
-  return container;
-};
-
-/* -------------------------------------------------
-   Config File Only
--------------------------------------------------- */
-export const ConfigFileOnly = () => {
-  resetBeforeStory();
-  const container = document.createElement("div");
-  container.style.margin = "2rem";
-
-  container.innerHTML = `
-    ${buildCodeBlock(`{
-      "files": {
-        "/App.js": "import React from 'react'; import {Hello} from './Hello'; export default function App() { return <Hello />; }",
-        "/Hello.tsx": "export const Hello = () => <h1>Hello Sandpack Embedder</h1>;"
+`,
       },
-      "template": "react",
-      "theme": "auto"
-    }`, "sandpack.config.json")}
-  `;
+      '/Hello.tsx': {
+        code: `export const Hello = () => <h1>Hello Sandpack Embedder</h1>;`,
+      },
+    },
+  });
 
   document.body.appendChild(container);
 
-  const instance = new SandpackEmbedder();
-  instance.load();
-
-  return container;
-};
-
-/* -------------------------------------------------
-   Without Config (auto-detect files only)
--------------------------------------------------- */
-export const WithoutConfig = () => {
-  resetBeforeStory();
-  const container = document.createElement("div");
-
-  container.innerHTML = `
-    ${buildCodeBlock(`
-console.log("Hello from default Sandpack setup!");
-`, "index.js")}
-  `;
-
-  document.body.appendChild(container);
-
-  const instance = new SandpackEmbedder();
-  instance.load();
+  const embedder = new SandpackEmbedder();
+  embedder.load();
 
   return container;
 };
@@ -254,23 +207,76 @@ console.log("Hello from default Sandpack setup!");
 -------------------------------------------------- */
 export const CustomSandpack = () => {
   resetBeforeStory();
-  const container = document.createElement("div");
+  const container = document.createElement('div');
 
-  container.innerHTML = `
-    ${buildCodeBlock(`{
-      "template": "vanilla"
-    }`, "sandpack.config.json")}
-    ${buildCodeBlock(`
-document.body.innerHTML = '<h2>Hello! I am using Custom Sandpack</h2>';
-`, "index.js")}
-  `;
+  container.innerHTML = buildSandpackBlock(
+    {
+      template: 'vanilla',
+      files: {
+        '/index.js': {
+          code: `document.body.innerHTML = '<h2>Hello! I am using Custom Sandpack</h2>';`,
+          active: true,
+        },
+      },
+    },
+    {
+      customComponentName: 'SandpackEnhanced',
+    },
+  );
 
   document.body.appendChild(container);
 
-  const instance = new SandpackEmbedder({
-    customSandpack: (props) => React.createElement(Sandpack, {...props, template: props.template || 'react'})
+  const SandpackEnhanced = (props) =>
+    React.createElement(Sandpack, {
+      ...props,
+      template: props.template || 'react',
+    });
+
+  const embedder = new SandpackEmbedder({
+    customComponent: SandpackEnhanced,
   });
-  instance.load();
+
+  embedder.load();
+
+  return container;
+};
+
+/* -------------------------------------------------
+   Refresh / Destroy Lifecycle Demo
+-------------------------------------------------- */
+export const RefreshAndDestroy = () => {
+  resetBeforeStory();
+  const container = document.createElement('div');
+
+  container.innerHTML = buildSandpackBlock({
+    template: 'vanilla',
+    files: {
+      '/index.js': {
+        code: `console.log("Testing refresh and destroy");`,
+        active: true,
+      },
+    },
+  });
+
+  document.body.appendChild(container);
+
+  const embedder = new SandpackEmbedder();
+  embedder.load();
+
+  const controls = document.createElement('div');
+  controls.style.margin = '1rem';
+
+  const refreshBtn = document.createElement('button');
+  refreshBtn.textContent = '🔄 Refresh';
+  refreshBtn.onclick = () => embedder.refresh();
+
+  const destroyBtn = document.createElement('button');
+  destroyBtn.textContent = '🧨 Destroy';
+  destroyBtn.style.marginLeft = '1rem';
+  destroyBtn.onclick = () => embedder.destroy();
+
+  controls.append(refreshBtn, destroyBtn);
+  container.prepend(controls);
 
   return container;
 };

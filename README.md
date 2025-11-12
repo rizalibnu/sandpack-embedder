@@ -67,7 +67,7 @@ new SandpackEmbedder({
   filePathSelector: ".file-path",               // File path element
   configFilePath: "sandpack.config.json",       // Config file
   playgroundContainerClass: "sandpack-playground", // Output wrapper class
-  customSandpack: MyCustomSandpack,             // Optional React component
+  customComponent: MyCustomSandpack,             // Optional React component
   theme: "light",                               // Initial Sandpack theme
 });
 ```
@@ -163,7 +163,7 @@ function MyCustomSandpack(props) {
 }
 
 new SandpackEmbedder({
-  customSandpack: MyCustomSandpack,
+  customComponent: MyCustomSandpack,
 }).load();
 ```
 
