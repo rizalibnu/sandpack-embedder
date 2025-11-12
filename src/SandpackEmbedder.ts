@@ -103,7 +103,7 @@ export class SandpackEmbedder {
   }
 
   /** Mount Sandpack instance for a group of code blocks */
-  #renderSandpack(groupBlocks: HTMLElement[], insertAfterEl: HTMLElement, configJson: string | null) {
+  #renderSandpack(groupBlocks: HTMLElement[], insertAfterEl: HTMLElement, configJson: string | null): void {
     const { configFilePath, codeContainerSelector, filePathSelector, initialTheme, CustomSandpack } = this;
 
     /** --- Parse config JSON --- */
@@ -181,7 +181,7 @@ export class SandpackEmbedder {
   }
 
   /** Broadcast theme change */
-  updateTheme(theme: SandpackProps["theme"]) {
+  updateTheme(theme: SandpackProps["theme"]): void {
     document.body.dispatchEvent(new CustomEvent(EVENTS.THEME_CHANGE, { detail: { theme } }));
   }
 

@@ -34,7 +34,7 @@ You can use `SandpackEmbedder` on **any web page** that includes HTML code block
 </div>
 
 <script type="module">
-  import SandpackEmbedder from "https://esm.sh/@rizalibnu/sandpack-embedder";
+  import { SandpackEmbedder } from "https://esm.sh/@rizalibnu/sandpack-embedder";
 
   const embedder = new SandpackEmbedder({
     codeSelector: ".code-sandpack",

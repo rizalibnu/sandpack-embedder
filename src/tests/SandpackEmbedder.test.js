@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { buildCodeBlock, CODE_CONTAINER_SELECTOR } from "../../utils";
-import SandpackEmbedder from "../index";
+import { SandpackEmbedder } from "../index";
 
 describe("SandpackEmbedder", () => {
   it("normalizes filenames correctly", () => {

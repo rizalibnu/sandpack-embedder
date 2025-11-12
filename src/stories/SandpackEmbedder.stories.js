@@ -1,7 +1,7 @@
 import { gruvboxDark } from "@codesandbox/sandpack-themes";
 import React from "react";
 import { Sandpack } from "@codesandbox/sandpack-react";
-import SandpackEmbedder from "../index.ts";
+import { SandpackEmbedder } from "../index";
 import { buildCodeBlock, CODE_CONTAINER_SELECTOR } from "../../utils";
 
 export default {

@@ -1,10 +1,10 @@
 /** Utility: escape HTML for rendering code safely */
-export function escapeCodeForHTML(code) {
+export function escapeCodeForHTML(code: string): string {
   return code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 /** Utility: build code blocks */
-export function buildCodeBlock(code, filename, language = "sandpack") {
+export function buildCodeBlock(code: string, filename: string, language = "sandpack"): string {
   return `
     <div class="code-container">
       <code class="code-${language}">
