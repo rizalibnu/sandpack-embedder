@@ -39,11 +39,7 @@ export interface SandpackEmbedderOptions {
   theme?: SandpackProps["theme"];
 }
 
-interface SandpackConfig {
-  template?: SandpackProps["template"];
-  customSetup?: SandpackProps["customSetup"];
-  options?: SandpackProps["options"];
-  teamId?: SandpackProps["teamId"];
+interface SandpackConfig extends Omit<SandpackProps, "files"> {
   files?: Record<
     string,
     string | Omit<SandpackFile, "code"> & { code?: string }
@@ -114,7 +110,7 @@ export class SandpackEmbedder {
       }
     }
 
-    const { template, customSetup, options, teamId, files: declaredFiles } = parsedConfig;
+    const { template, customSetup, options, teamId, files: declaredFiles, theme: themeFromConfig } = parsedConfig;
     const files: NonNullable<SandpackProps["files"]> = {};
 
     /** --- Collect files --- */
@@ -163,6 +159,8 @@ export class SandpackEmbedder {
     const SandpackApp: React.FC = () => {
       const [theme, setTheme] = useState(initialTheme);
       useEffect(() => {
+        if (themeFromConfig) return;
+        
         const handleThemeChange = (e: Event) => {
           if (!(e instanceof CustomEvent)) return;
           setTheme(e.detail.theme);
@@ -172,7 +170,7 @@ export class SandpackEmbedder {
       }, []);
 
       const Component = CustomSandpack ?? Sandpack;
-      return React.createElement(Component, { ...sandpackProps, theme });
+      return React.createElement(Component, { ...sandpackProps, theme: themeFromConfig ?? theme });
     };
 
     /** --- Mount React --- */

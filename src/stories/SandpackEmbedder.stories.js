@@ -215,7 +215,8 @@ export const ConfigFileOnly = () => {
         "/App.js": "import React from 'react'; import {Hello} from './Hello'; export default function App() { return <Hello />; }",
         "/Hello.tsx": "export const Hello = () => <h1>Hello Sandpack Embedder</h1>;"
       },
-      "template": "react"
+      "template": "react",
+      "theme": "auto"
     }`, "sandpack.config.json")}
   `;
 
