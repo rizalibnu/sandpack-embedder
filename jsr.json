@@ -1,6 +1,6 @@
 {
   "name": "@rizalibnu/sandpack-embedder",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "license": "MIT",
   "imports": {
     "react": "npm:react@19.2.0",
