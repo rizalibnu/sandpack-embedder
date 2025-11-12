@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import type { SandpackProps } from "@codesandbox/sandpack-react";
+import type { SandpackFile, SandpackProps } from "@codesandbox/sandpack-react";
 import { Sandpack } from "@codesandbox/sandpack-react";
 
 /** --- Constants --- */
@@ -46,11 +46,7 @@ interface SandpackConfig {
   teamId?: SandpackProps["teamId"];
   files?: Record<
     string,
-    {
-      code?: string;
-      active?: boolean;
-      hidden?: boolean;
-    }
+    string | Omit<SandpackFile, "code"> & { code?: string }
   >;
 }
 
@@ -59,6 +55,7 @@ export class SandpackEmbedder {
   private readonly codeContainerSelector: string;
   private readonly filePathSelector: string;
   private readonly playgroundContainerClass: string;
+  private readonly playgroundContainerSelector: string;
   private readonly configFilePath: string | null;
   private readonly CustomSandpack?: React.ComponentType<SandpackProps>;
   private readonly initialTheme?: SandpackProps["theme"];
@@ -69,6 +66,7 @@ export class SandpackEmbedder {
     this.codeContainerSelector = options.codeContainerSelector ?? SELECTORS.CODE_CONTAINER;
     this.filePathSelector = options.filePathSelector ?? SELECTORS.FILE_PATH;
     this.playgroundContainerClass = options.playgroundContainerClass ?? CLASSNAMES.PLAYGROUND_CONTAINER;
+    this.playgroundContainerSelector = this.playgroundContainerClass.split(" ").map((cn) => `.${cn}`).join("");
     this.configFilePath = SandpackEmbedder.normalizeFilePath(options.configFilePath ?? DEFAULT_CONFIG_FILE_PATH);
     this.CustomSandpack = options.customSandpack;
     this.initialTheme = options.theme;
@@ -125,7 +123,9 @@ export class SandpackEmbedder {
         const normalizedPath = SandpackEmbedder.normalizeFilePath(path);
         if (!normalizedPath) continue;
 
-        if (fileConfig.code !== undefined) {
+        if (typeof fileConfig === "string") {
+          files[normalizedPath] = fileConfig;
+        } else if (fileConfig.code !== undefined) {
           files[normalizedPath] = { code: fileConfig.code, ...fileConfig };
         } else {
           const matchingBlock = groupBlocks.find((block) => {
@@ -232,12 +232,15 @@ export class SandpackEmbedder {
       let configCode: string | null = null;
       if (configBlock) {
         configCode = configBlock.textContent?.trim() ?? null;
-        // Remove config block from group
-        groupBlocks.splice(groupBlocks.indexOf(configBlock), 1);
       }
 
       const insertAfterEl = groupBlocks[groupBlocks.length - 1]?.closest(codeContainerSelector) as HTMLElement | null;
+
       if (insertAfterEl) {
+        if (configBlock) {
+          // Remove config block from group
+          groupBlocks.splice(groupBlocks.indexOf(configBlock), 1);
+        }
         this.#renderSandpack(groupBlocks, insertAfterEl, configCode);
       }
     });
@@ -247,7 +250,7 @@ export class SandpackEmbedder {
 
   /** Destroy all Sandpack instances */
   destroy(): void {
-    const roots = document.querySelectorAll(`.${this.playgroundContainerClass}`);
+    const roots = document.querySelectorAll(this.playgroundContainerSelector);
     roots.forEach((el) => el.remove());
   }
 

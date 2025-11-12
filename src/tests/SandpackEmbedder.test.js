@@ -151,19 +151,21 @@ describe("SandpackEmbedder", () => {
   });
 
   it("refresh removes old roots and re-renders new ones", () => {
-    const sandpack = new SandpackEmbedder();
+    const sandpack = new SandpackEmbedder({
+      playgroundContainerClass: "sandpack-refresh test",
+    });
     const container = document.createElement("div");
     container.innerHTML = buildCodeBlock(`console.log("Refresh Root")`, "index.js");
     document.body.appendChild(container);
 
     sandpack.load();
 
-    const oldRoot = document.querySelector(`.${sandpack.playgroundContainerClass}`);
+    const oldRoot = document.querySelector(`.sandpack-refresh.test`);
     expect(oldRoot).not.toBeNull();
 
     sandpack.refresh();
 
-    const newRoot = document.querySelector(`.${sandpack.playgroundContainerClass}`);
+    const newRoot = document.querySelector(`.sandpack-refresh.test`);
     expect(newRoot).not.toBe(oldRoot);
   });
 });

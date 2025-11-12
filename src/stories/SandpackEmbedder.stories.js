@@ -202,6 +202,32 @@ export default Button;
 };
 
 /* -------------------------------------------------
+   Config File Only
+-------------------------------------------------- */
+export const ConfigFileOnly = () => {
+  resetBeforeStory();
+  const container = document.createElement("div");
+  container.style.margin = "2rem";
+
+  container.innerHTML = `
+    ${buildCodeBlock(`{
+      "files": {
+        "/App.js": "import React from 'react'; import {Hello} from './Hello'; export default function App() { return <Hello />; }",
+        "/Hello.tsx": "export const Hello = () => <h1>Hello Sandpack Embedder</h1>;"
+      },
+      "template": "react"
+    }`, "sandpack.config.json")}
+  `;
+
+  document.body.appendChild(container);
+
+  const instance = new SandpackEmbedder();
+  instance.load();
+
+  return container;
+};
+
+/* -------------------------------------------------
    Without Config (auto-detect files only)
 -------------------------------------------------- */
 export const WithoutConfig = () => {
