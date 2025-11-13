@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/rizalibnu/sandpack-embedder/compare/v1.3.0...v1.4.0) (2025-11-13)
+
+### Features
+
+* rename sandpackSelector to codeSelector for consistency across documentation and implementation ([2a0d3b1](https://github.com/rizalibnu/sandpack-embedder/commit/2a0d3b173c82bb5ce0f6b3c1fc1b0d801e6774af))
+
 ## [1.3.0](https://github.com/rizalibnu/sandpack-embedder/compare/v1.2.1...v1.3.0) (2025-11-13)
 
 ### Features
