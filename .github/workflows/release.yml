@@ -4,12 +4,20 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Select branch to publish canary from"
+        required: true
+        default: ""
+        type: string
 
 permissions:
   contents: write
   issues: write
   pull-requests: write
   id-token: write
+  packages: write
 
 jobs:
   release:
@@ -20,11 +28,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Setup Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
@@ -44,11 +47,31 @@ jobs:
       - name: Run tests
         run: pnpm test
 
+      - name: Run typescript checks
+        run: pnpm type-check
+
+      - name: Run linter checks
+        run: pnpm lint
+
       - name: Build
         run: pnpm build
 
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm semantic-release --debug
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "🚀 Running manual canary release on branch '${{ github.event.inputs.branch }}'"
+            pnpm semantic-release --branches "${{ github.event.inputs.branch }}" --no-ci
+          elif [ "${{ github.ref_name }}" = "master" ]; then
+            echo "📦 Running stable release on master"
+            pnpm semantic-release
+          else
+            echo "⚠️ Skipping release: this branch only supports manual canary trigger"
+          fi

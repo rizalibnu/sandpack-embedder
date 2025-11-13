@@ -1,1 +1,1 @@
-export * from "./SandpackEmbedder";
+export * from './SandpackEmbedder';
