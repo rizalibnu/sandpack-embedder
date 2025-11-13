@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { buildSandpackBlock } from '../../utils';
+import { buildSandpackBlock } from '../utils';
 import { SandpackEmbedder } from '../index';
 
 describe('SandpackEmbedder', () => {

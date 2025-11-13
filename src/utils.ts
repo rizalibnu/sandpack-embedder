@@ -5,7 +5,7 @@ import type { SandpackFile, SandpackFiles, SandpackProps } from '@codesandbox/sa
  * @param code - The raw code string to escape.
  * @returns Escaped HTML string safe for innerHTML.
  */
-function escapeCodeForHTML(code: string): string {
+export function escapeCodeForHTML(code: string): string {
   return code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
@@ -23,21 +23,27 @@ function serializeAttrValue(value: unknown): string {
 }
 
 /**
- * Build an HTML code block that embeds a Sandpack instance.
+ * convert a string from camelCase to kebab-case
  */
-export function buildSandpackBlock(
+function camelCaseToKebabCase(str: string): string {
+  return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+}
+
+/**
+ * Combine everything into escaped code HTML block
+ */
+export function buildSandpackCode(
   props: SandpackProps,
-  options?: { codeElClass?: string; customComponentName?: string },
+  options?: { customComponentName?: string },
 ): string {
   const { files = {}, ...rest } = props;
-  const codeElClass = options?.codeElClass || 'code-sandpack';
-  const SandpackComponent = options?.customComponentName || 'Sandpack';
+  const sandpackComponent = options?.customComponentName || 'sandpack';
 
   // Build Sandpack attributes (theme, template, options, etc.)
   const attrString = Object.entries(rest)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .filter(([_, value]) => value !== undefined)
-    .map(([key, value]) => `${key}='${serializeAttrValue(value)}'`)
+    .map(([key, value]) => `${camelCaseToKebabCase(key)}='${serializeAttrValue(value)}'`)
     .join(' ');
 
   // Build file code blocks
@@ -57,8 +63,20 @@ export function buildSandpackBlock(
     })
     .join('\n\n');
 
+  return `<${sandpackComponent}${attrString ? ' ' + attrString : ''}>\n${fileBlocks}\n\n</${sandpackComponent}>`;
+}
+
+/**
+ * Build an HTML code block that embeds a Sandpack instance.
+ */
+export function buildSandpackBlock(
+  props: SandpackProps,
+  options?: { codeElClass?: string; customComponentName?: string },
+): string {
+  const codeElClass = options?.codeElClass || 'code-sandpack';
+
   // Combine everything into escaped code HTML block
-  const sandpackCode = `<${SandpackComponent}${attrString ? ' ' + attrString : ''}>\n${fileBlocks}\n\n</${SandpackComponent}>`;
+  const sandpackCode = buildSandpackCode(props, options);
 
   return `
 <div class="code-container">

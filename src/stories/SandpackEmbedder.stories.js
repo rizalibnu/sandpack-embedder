@@ -2,7 +2,7 @@ import React from 'react';
 import { gruvboxDark } from '@codesandbox/sandpack-themes';
 import { Sandpack } from '@codesandbox/sandpack-react';
 import { SandpackEmbedder } from '../index';
-import { buildSandpackBlock } from '../../utils';
+import { buildSandpackBlock } from '../utils';
 
 export default {
   title: 'SandpackEmbedder',
@@ -36,6 +36,12 @@ export default function App() {
       },
     },
     options: { editorHeight: '400px' },
+    customSetup: {
+      dependencies: {
+        react: '19.2.0',
+        'react-dom': '19.2.0',
+      },
+    },
   });
 
   document.body.appendChild(container);

@@ -24,7 +24,7 @@ export interface SandpackEmbedderOptions {
   /** CSS selector used to find code elements containing escaped <Sandpack> markup. */
   sandpackSelector?: string;
 
-  /** CSS class name applied to the mount container created for each embed. */
+  /** CSS class name applied to the mount container created for each playground embed. */
   playgroundClass?: string;
 
   /** Custom Sandpack React components (keyed by name, e.g. "Sandpack"). */
@@ -74,7 +74,7 @@ export class SandpackEmbedder {
 
   constructor(options: SandpackEmbedderOptions = {}) {
     this.sandpackSelector = options.sandpackSelector ?? '.code-sandpack';
-    this.components = { Sandpack, ...options.customComponents };
+    this.components = { sandpack: Sandpack, ...options.customComponents };
     this.playgroundClass = options.playgroundClass ?? 'sandpack-container';
     this.sandpackPlaygroundSelector = this.playgroundClass
       .split(' ')
@@ -183,42 +183,73 @@ export class SandpackEmbedder {
 
   /**
    * Parses attribute-style props from a raw HTML-like tag.
-   * Automatically converts JSON-like strings into objects or primitives.
-   * @param raw Raw props string, e.g. `template="react" options='{"editorHeight":"400px"}'`
+   * Supports JSON, JSX-like props (`{{ ... }}`), kebab-case keys, and nested quotes.
+   * Example:
+   * <sandpack template="react" custom-setup="{ \"dependencies\": { \"react\": \"19.2.0\" } }">
    */
   private parseProps(raw: string): SandpackProps {
     const props: Record<string, unknown> = {};
-    const parts = raw.match(/(?:[^\s'"]+|'[^']*'|"[^"]*")+/g) ?? [];
 
-    for (const part of parts) {
-      const [key, ...valueParts] = part.split('=');
-      if (!key || !valueParts.length) continue;
+    // Split attributes safely by spaces outside quotes
+    const attrRegex = /([^\s=]+)(?:=(?:"([^"]*)"|'([^']*)'|([^\s"'>]+)))?/g;
+    let match: RegExpExecArray | null;
 
-      let value = valueParts.join('=').trim();
+    while ((match = attrRegex.exec(raw))) {
+      // eslint-disable-next-line prefer-const
+      let [, key, doubleQuoted, singleQuoted, unquoted] = match;
+      let value = doubleQuoted ?? singleQuoted ?? unquoted ?? true;
 
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
+      // Convert kebab-case → camelCase
+      key = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
-      try {
-        if (value.startsWith('{') || value.startsWith('[')) {
-          props[key] = JSON.parse(value);
-        } else if (value === 'true' || value === 'false') {
+      // Parse booleans / numbers / JSON-like objects
+      if (typeof value === 'string') {
+        value = value.trim();
+        if (value === 'true' || value === 'false') {
           props[key] = value === 'true';
-        } else if (!isNaN(Number(value))) {
+          continue;
+        }
+        if (!isNaN(Number(value)) && value !== '') {
           props[key] = Number(value);
+          continue;
+        }
+
+        // Detect JSON-like or JSX-like
+        if (/^{{.*}}$/.test(value)) {
+          value = value.slice(1, -1); // remove one layer of braces
+        }
+
+        if (/^{[\s\S]*}$/.test(value) || /^\[.*\]$/.test(value)) {
+          const parsed = this.safeJsonParse(value);
+          props[key] = parsed;
         } else {
           props[key] = value;
         }
-      } catch {
+      } else {
         props[key] = value;
       }
     }
 
     return props as SandpackProps;
+  }
+
+  /**
+   * Safely parses a JSON-like string into an object.
+   * Fixes common mistakes like unquoted keys or single quotes.
+   */
+  private safeJsonParse(value: string) {
+    try {
+      return JSON.parse(value);
+    } catch {
+      try {
+        // Fix missing quotes on keys and single quotes
+        const fixed = value.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":').replace(/'/g, '"');
+        return JSON.parse(fixed);
+      } catch {
+        console.warn('⚠️ Failed to parse JSON-like value:', value);
+        return value;
+      }
+    }
   }
 
   /**
