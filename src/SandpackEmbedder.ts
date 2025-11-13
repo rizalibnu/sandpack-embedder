@@ -5,6 +5,9 @@ import {
   type SandpackInternal,
   type SandpackFile,
   type SandpackProps,
+  type DeepPartial,
+  type SandpackTheme,
+  type SandpackPredefinedTheme,
 } from '@codesandbox/sandpack-react';
 
 /**
@@ -19,16 +22,19 @@ const EVENTS = {
  */
 export interface SandpackEmbedderOptions {
   /** CSS selector used to find code elements containing escaped <Sandpack> markup. */
-  sandpackSelector: string;
+  sandpackSelector?: string;
 
   /** CSS class name applied to the mount container created for each embed. */
   playgroundClass?: string;
 
   /** Custom Sandpack React components (keyed by name, e.g. "Sandpack"). */
-  customComponent?: Record<string, React.ComponentType<SandpackProps>>;
+  customComponents?: Record<string, React.ComponentType<SandpackProps>>;
 
   /** Default theme used when not specified by props. */
-  theme?: SandpackProps['theme'];
+  theme?: string | SandpackProps['theme'];
+
+  /** Custom Sandpack Theme (keyed by name, e.g. "amethyst").  */
+  customThemes?: Record<string, DeepPartial<SandpackTheme>>;
 
   /**
    * Selector or callback that determines where to inject the Sandpack playground.
@@ -49,33 +55,35 @@ interface SandpackInstance {
   mount: HTMLElement;
 }
 
+type Component = React.ComponentType<SandpackProps> | SandpackInternal;
+
 /**
  * SandpackEmbedder scans the DOM for escaped <Sandpack> blocks,
  * parses their props and code blocks, and renders live Sandpack previews.
  */
-type Component = React.ComponentType<SandpackProps> | SandpackInternal;
-
 export class SandpackEmbedder {
   private sandpackSelector: string;
   private sandpackPlaygroundSelector: string;
-  private component: Record<string, Component>;
+  private components: Record<string, Component>;
   private playgroundClass: string;
-  private theme?: SandpackProps['theme'];
+  private theme?: string | SandpackProps['theme'];
+  private customThemes?: Record<string, DeepPartial<SandpackTheme>>;
   private injectTarget?: SandpackEmbedderOptions['injectTarget'];
   private injectPosition: NonNullable<SandpackEmbedderOptions['injectPosition']>;
   private instances: SandpackInstance[] = [];
 
-  constructor(options: SandpackEmbedderOptions) {
-    this.sandpackSelector = options.sandpackSelector;
-    this.component = { Sandpack, ...options.customComponent };
+  constructor(options: SandpackEmbedderOptions = {}) {
+    this.sandpackSelector = options.sandpackSelector ?? '.code-sandpack';
+    this.components = { Sandpack, ...options.customComponents };
     this.playgroundClass = options.playgroundClass ?? 'sandpack-container';
     this.sandpackPlaygroundSelector = this.playgroundClass
       .split(' ')
       .map((cn) => `.${cn}`)
       .join('');
-    this.theme = options.theme ?? 'dark';
     this.injectTarget = options.injectTarget;
     this.injectPosition = options.injectPosition ?? 'after';
+    this.customThemes = options.customThemes;
+    this.theme = options.theme;
   }
 
   /**
@@ -88,7 +96,7 @@ export class SandpackEmbedder {
 
       if (!match) return;
       const [, componentName, rawProps, inner] = match;
-      const Component = this.component[componentName];
+      const Component = this.components[componentName];
       if (!Component) return;
 
       const props = this.parseProps(rawProps);
@@ -145,10 +153,24 @@ export class SandpackEmbedder {
           };
         }, []);
 
+        const getTheme = React.useCallback(
+          (
+            theme: string | DeepPartial<SandpackTheme> | undefined,
+          ): SandpackPredefinedTheme | DeepPartial<SandpackTheme> | undefined => {
+            if (typeof theme === 'string') {
+              if (['light', 'dark', 'auto'].includes(theme))
+                return theme as SandpackPredefinedTheme;
+              return this.customThemes ? this.customThemes[theme] : undefined;
+            }
+            return theme;
+          },
+          [],
+        );
+
         return React.createElement(Component, {
           ...props,
           files,
-          theme: props.theme ?? theme,
+          theme: getTheme(props.theme ?? theme),
         });
       };
 
@@ -161,6 +183,8 @@ export class SandpackEmbedder {
 
   /**
    * Parses attribute-style props from a raw HTML-like tag.
+   * Automatically converts JSON-like strings into objects or primitives.
+   * @param raw Raw props string, e.g. `template="react" options='{"editorHeight":"400px"}'`
    */
   private parseProps(raw: string): SandpackProps {
     const props: Record<string, unknown> = {};
@@ -199,6 +223,7 @@ export class SandpackEmbedder {
 
   /**
    * Parses code blocks within ``` fences into Sandpack file objects.
+   * @param content Content inside the <Sandpack>...</Sandpack> block
    */
   private parseFiles(content: string): Record<string, SandpackFile> {
     const fileBlocks = [...content.matchAll(/```(\w+)\s+([^\n]+)\n([\s\S]*?)```/g)];
@@ -217,21 +242,34 @@ export class SandpackEmbedder {
     return files;
   }
 
+  /**
+   * Decodes escaped HTML entities like &lt; &gt; &amp; into actual characters.
+   */
   private decodeHTML(html: string): string {
     const txt = document.createElement('textarea');
     txt.innerHTML = html;
     return txt.value;
   }
 
+  /**
+   * Broadcasts a theme change event to all mounted Sandpack instances.
+   * @param theme New theme to apply ("light", "dark", or a custom theme object)
+   */
   updateTheme(theme: SandpackProps['theme']): void {
     document.body.dispatchEvent(new CustomEvent(EVENTS.THEME_CHANGE, { detail: { theme } }));
   }
 
+  /**
+   * Fully re-initializes all embedded Sandpack instances.
+   */
   refresh(): void {
     this.destroy();
     this.load();
   }
 
+  /**
+   * Destroys all mounted Sandpack instances and removes their containers from the DOM.
+   */
   destroy(): void {
     this.instances.forEach(({ root }) => root.unmount());
     this.instances = [];
