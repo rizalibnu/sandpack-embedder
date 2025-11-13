@@ -1,3 +1,9 @@
+## [1.4.1](https://github.com/rizalibnu/sandpack-embedder/compare/v1.4.0...v1.4.1) (2025-11-13)
+
+### Bug Fixes
+
+* correct quotation marks in README for consistency in code examples ([fe83796](https://github.com/rizalibnu/sandpack-embedder/commit/fe83796c44e8408ed882425f7c922be8eaf5fbb4))
+
 ## [1.4.0](https://github.com/rizalibnu/sandpack-embedder/compare/v1.3.0...v1.4.0) (2025-11-13)
 
 ### Features
