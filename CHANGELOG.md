@@ -1,3 +1,9 @@
+## [1.4.2](https://github.com/rizalibnu/sandpack-embedder/compare/v1.4.1...v1.4.2) (2025-11-13)
+
+### Bug Fixes
+
+*  load method should return 'this' for  method chaining ([4e1e452](https://github.com/rizalibnu/sandpack-embedder/commit/4e1e452d96feba063d0d05b81c930ad40ff17d80))
+
 ## [1.4.1](https://github.com/rizalibnu/sandpack-embedder/compare/v1.4.0...v1.4.1) (2025-11-13)
 
 ### Bug Fixes
