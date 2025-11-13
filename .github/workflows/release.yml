@@ -68,10 +68,10 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "🚀 Running manual canary release on branch '${{ github.event.inputs.branch }}'"
-            pnpm semantic-release --branches "${{ github.event.inputs.branch }}" --no-ci
+            pnpm semantic-release --branches "${{ github.event.inputs.branch }}" --no-ci --debug
           elif [ "${{ github.ref_name }}" = "master" ]; then
             echo "📦 Running stable release on master"
-            pnpm semantic-release
+            pnpm semantic-release --debug
           else
             echo "⚠️ Skipping release: this branch only supports manual canary trigger"
           fi
