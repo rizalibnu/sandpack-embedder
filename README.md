@@ -12,7 +12,7 @@ It:
 
 1. Finds elements containing `<sandpack>`-like markup.
 2. Extracts and decodes escaped HTML.
-3. Parses props like `template="react"` and `options='{"editorHeight":400}'`.
+3. Parses props like `template="react"` and `options="{'editorHeight':400}"`.
 4. Creates a live **Sandpack React playground** inside your CMS-rendered page.
 
 ---
@@ -24,9 +24,9 @@ It:
 <sandpack
   template="react"
   custom-setup="{
-    "dependencies": {
-      "react": "19.2.0",
-      "react-dom": "19.2.0"
+    'dependencies': {
+      'react': '19.2.0',
+      'react-dom': '19.2.0'
     }
   }"
 >
