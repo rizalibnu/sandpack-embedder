@@ -78,11 +78,6 @@
     "vitest": "^2.0.0"
   },
   "packageManager": "pnpm@10.4.1",
-  "release": {
-    "branches": [
-      "master"
-    ]
-  },
   "publishConfig": {
     "access": "public"
   }
