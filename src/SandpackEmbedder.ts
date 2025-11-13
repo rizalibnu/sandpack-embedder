@@ -84,7 +84,7 @@ export class SandpackEmbedder {
   /**
    * Scans the DOM for matching code blocks and renders Sandpack components inside them.
    */
-  load(): void {
+  load(): this {
     document.querySelectorAll<HTMLElement>(this.codeSelector).forEach((el) => {
       const decoded = this.decodeHTML(el.innerHTML);
       const match = decoded.match(/<([A-Za-z]+)([^>]*)>([\s\S]*?)<\/\1>/);
@@ -174,6 +174,8 @@ export class SandpackEmbedder {
       root.render(React.createElement(SandpackApp));
       this.instances.push({ root, mount });
     });
+
+    return this;
   }
 
   /**
