@@ -22,7 +22,7 @@ const EVENTS = {
  */
 export interface SandpackEmbedderOptions {
   /** CSS selector used to find code elements containing escaped <Sandpack> markup. */
-  sandpackSelector?: string;
+  codeSelector?: string;
 
   /** CSS class name applied to the mount container created for each playground embed. */
   playgroundClass?: string;
@@ -62,8 +62,7 @@ type Component = React.ComponentType<SandpackProps> | SandpackInternal;
  * parses their props and code blocks, and renders live Sandpack previews.
  */
 export class SandpackEmbedder {
-  private sandpackSelector: string;
-  private sandpackPlaygroundSelector: string;
+  private codeSelector: string;
   private components: Record<string, Component>;
   private playgroundClass: string;
   private theme?: string | SandpackProps['theme'];
@@ -73,13 +72,9 @@ export class SandpackEmbedder {
   private instances: SandpackInstance[] = [];
 
   constructor(options: SandpackEmbedderOptions = {}) {
-    this.sandpackSelector = options.sandpackSelector ?? '.code-sandpack';
+    this.codeSelector = options.codeSelector ?? '.code-sandpack';
     this.components = { sandpack: Sandpack, ...options.customComponents };
     this.playgroundClass = options.playgroundClass ?? 'sandpack-container';
-    this.sandpackPlaygroundSelector = this.playgroundClass
-      .split(' ')
-      .map((cn) => `.${cn}`)
-      .join('');
     this.injectTarget = options.injectTarget;
     this.injectPosition = options.injectPosition ?? 'after';
     this.customThemes = options.customThemes;
@@ -90,7 +85,7 @@ export class SandpackEmbedder {
    * Scans the DOM for matching code blocks and renders Sandpack components inside them.
    */
   load(): void {
-    document.querySelectorAll<HTMLElement>(this.sandpackSelector).forEach((el) => {
+    document.querySelectorAll<HTMLElement>(this.codeSelector).forEach((el) => {
       const decoded = this.decodeHTML(el.innerHTML);
       const match = decoded.match(/<([A-Za-z]+)([^>]*)>([\s\S]*?)<\/\1>/);
 
@@ -302,9 +297,10 @@ export class SandpackEmbedder {
    * Destroys all mounted Sandpack instances and removes their containers from the DOM.
    */
   destroy(): void {
-    this.instances.forEach(({ root }) => root.unmount());
+    this.instances.forEach(({ root, mount }) => {
+      root.unmount();
+      mount.remove();
+    });
     this.instances = [];
-    const sandpacks = document.querySelectorAll(this.sandpackPlaygroundSelector);
-    sandpacks.forEach((el) => el.remove());
   }
 }

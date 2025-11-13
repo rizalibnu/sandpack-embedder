@@ -82,7 +82,7 @@ You can use `SandpackEmbedder` on **any web page** that includes HTML code block
   import { SandpackEmbedder } from "https://esm.sh/@rizalibnu/sandpack-embedder";
 
   const sandpack = new SandpackEmbedder({
-    sandpackSelector: ".code-sandpack",
+    codeSelector: ".code-sandpack",
     playgroundClass: "sandpack-playground",
   });
 
@@ -113,7 +113,7 @@ You can customize selectors, theme, or even replace the Sandpack component.
 ```ts
 export interface SandpackEmbedderOptions {
   /** CSS selector used to find code elements containing escaped <Sandpack> markup. */
-  sandpackSelector?: string;
+  codeSelector?: string;
 
   /** CSS class name applied to the mount container created for each playground embed. */
   playgroundClass?: string;
@@ -170,7 +170,7 @@ You can let users decide where the live playground is inserted relative to the `
 
 ```js
 new SandpackEmbedder({
-  sandpackSelector: ".language-sandpack",
+  codeSelector: ".language-sandpack",
   injectTarget: ".code-wrapper",
   injectPosition: "after", // "after" | "before" | "replace" | "inside"
 }).load();
@@ -180,7 +180,7 @@ Use a function for full control
 
 ```js
 new SandpackEmbedder({
-  sandpackSelector: ".language-sandpack",
+  codeSelector: ".language-sandpack",
   injectTarget: (el) => el.closest(".code-wrapper")?.querySelector("pre"),
   injectPosition: "inside"
 });

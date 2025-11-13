@@ -35,9 +35,9 @@ describe('SandpackEmbedder', () => {
     expect(document.querySelector(`.sandpack-container`)).not.toBeNull();
   });
 
-  it('supports custom sandpackSelector', () => {
+  it('supports custom codeSelector', () => {
     const sandpack = new SandpackEmbedder({
-      sandpackSelector: '.code-js',
+      codeSelector: '.code-js',
     });
 
     const container = document.createElement('div');
