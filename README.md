@@ -30,10 +30,10 @@ It:
     }
   }"
 >
-```js /index.js
-import "./styles.css";
-
-document.getElementById("app").innerHTML = "<h1>Hello Sandpack</h1>";
+```js /App.js
+export default function App() {
+  return <h1>Hello world</h1>
+}
 ```
 ```js /hidden-file.js hidden
 console.log("I'm  hidden");
@@ -136,6 +136,9 @@ export interface SandpackEmbedderOptions {
 
   /** Controls where the mount node is injected relative to injectTarget. */
   injectPosition?: 'before' | 'after' | 'replace' | 'inside';
+
+  /** Controls visibility of the original code snippet. Default: 'false' */
+  showOriginalCode?: boolean;
 }
 ```
 
@@ -194,14 +197,14 @@ You can override the theme or add your own:
 ```js
 import { amethyst, aquaBlue } from "@codesandbox/sandpack-themes";
 const sandpack = new SandpackEmbedder({
-    customThemes: { amethyst, aquaBlue },
+    customThemes: { amethyst, aquaBlue, neoCyan },
     theme: "amethyst"
 }).load();
 
 sandpack.updateTheme("aquaBlue");
 ```
 ````md
-<sandpack theme="amethyst">
+<sandpack theme="neoCyan">
   // markdown code blocks...
 </sandpack>
 ````

@@ -45,6 +45,9 @@ export interface SandpackEmbedderOptions {
 
   /** Controls where the mount node is injected relative to injectTarget. */
   injectPosition?: 'before' | 'after' | 'replace' | 'inside';
+
+  /** Controls visibility of the original code snippet. Default: 'false' */
+  showOriginalCode?: boolean;
 }
 
 /**
@@ -69,6 +72,7 @@ export class SandpackEmbedder {
   private customThemes?: Record<string, DeepPartial<SandpackTheme>>;
   private injectTarget?: SandpackEmbedderOptions['injectTarget'];
   private injectPosition: NonNullable<SandpackEmbedderOptions['injectPosition']>;
+  private showOriginalCode: boolean;
   private instances: SandpackInstance[] = [];
 
   constructor(options: SandpackEmbedderOptions = {}) {
@@ -77,6 +81,7 @@ export class SandpackEmbedder {
     this.playgroundClass = options.playgroundClass ?? 'sandpack-container';
     this.injectTarget = options.injectTarget;
     this.injectPosition = options.injectPosition ?? 'after';
+    this.showOriginalCode = options.showOriginalCode ?? false;
     this.customThemes = options.customThemes;
     this.theme = options.theme;
   }
@@ -94,13 +99,16 @@ export class SandpackEmbedder {
       const Component = this.components[componentName];
       if (!Component) return;
 
-      const props = this.parseProps(rawProps);
+      const { showOriginalCode, ...props } = this.parseProps(rawProps);
       const files = this.parseFiles(inner);
+
+      if (!showOriginalCode && !this.showOriginalCode) {
+        el.style.display = 'none';
+      }
 
       /** Create mount container */
       const mount = document.createElement('div');
       mount.className = this.playgroundClass;
-      el.style.display = 'none';
 
       /** Find injection target */
       const target =
@@ -184,7 +192,7 @@ export class SandpackEmbedder {
    * Example:
    * <sandpack template="react" custom-setup="{ \"dependencies\": { \"react\": \"19.2.0\" } }">
    */
-  private parseProps(raw: string): SandpackProps {
+  private parseProps(raw: string): SandpackProps & { showOriginalCode: boolean } {
     const props: Record<string, unknown> = {};
 
     // Split attributes safely by spaces outside quotes
@@ -227,7 +235,7 @@ export class SandpackEmbedder {
       }
     }
 
-    return props as SandpackProps;
+    return props as unknown as SandpackProps & { showOriginalCode: boolean };
   }
 
   /**

@@ -33,7 +33,7 @@ function camelCaseToKebabCase(str: string): string {
  * Combine everything into escaped code HTML block
  */
 export function buildSandpackCode(
-  props: SandpackProps,
+  props: SandpackProps & { showOriginalCode: boolean },
   options?: { customComponentName?: string },
 ): string {
   const { files = {}, ...rest } = props;
@@ -70,7 +70,7 @@ export function buildSandpackCode(
  * Build an HTML code block that embeds a Sandpack instance.
  */
 export function buildSandpackBlock(
-  props: SandpackProps,
+  props: SandpackProps & { showOriginalCode: boolean },
   options?: { codeElClass?: string; customComponentName?: string },
 ): string {
   const codeElClass = options?.codeElClass || 'code-sandpack';
