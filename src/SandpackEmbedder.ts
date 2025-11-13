@@ -19,16 +19,26 @@ const EVENTS = {
  */
 export interface SandpackEmbedderOptions {
   /** CSS selector used to find code elements containing escaped <Sandpack> markup. */
-  sandpackSelector?: string;
-
-  /** Custom Sandpack React component, if you want to override default Sandpack. */
-  customComponent?: React.ComponentType<SandpackProps> | React.ComponentType<SandpackProps>[];
+  sandpackSelector: string;
 
   /** CSS class name applied to the mount container created for each embed. */
   playgroundClass?: string;
 
+  /** Custom Sandpack React components (keyed by name, e.g. "Sandpack"). */
+  customComponent?: Record<string, React.ComponentType<SandpackProps>>;
+
   /** Default theme used when not specified by props. */
   theme?: SandpackProps['theme'];
+
+  /**
+   * Selector or callback that determines where to inject the Sandpack playground.
+   * - If string → resolved via `closest(selector)` from code block
+   * - If function → return a DOM element relative to the code block
+   */
+  injectTarget?: string | ((codeEl: HTMLElement) => HTMLElement | null);
+
+  /** Controls where the mount node is injected relative to injectTarget. */
+  injectPosition?: 'before' | 'after' | 'replace' | 'inside';
 }
 
 /**
@@ -42,42 +52,30 @@ interface SandpackInstance {
 /**
  * SandpackEmbedder scans the DOM for escaped <Sandpack> blocks,
  * parses their props and code blocks, and renders live Sandpack previews.
- *
- * Example:
- * ```html
- * <code class="code-sandpack">
- * &lt;Sandpack template="react"&gt;
- * ```js /index.js active
- * console.log('Hello Sandpack')
- * ```
- * &lt;/Sandpack&gt;
- * </code>
- * ```
  */
-
 type Component = React.ComponentType<SandpackProps> | SandpackInternal;
+
 export class SandpackEmbedder {
   private sandpackSelector: string;
   private sandpackPlaygroundSelector: string;
-  private component: Component[];
+  private component: Record<string, Component>;
   private playgroundClass: string;
   private theme?: SandpackProps['theme'];
+  private injectTarget?: SandpackEmbedderOptions['injectTarget'];
+  private injectPosition: NonNullable<SandpackEmbedderOptions['injectPosition']>;
   private instances: SandpackInstance[] = [];
 
-  constructor(options: SandpackEmbedderOptions = {}) {
-    this.sandpackSelector = options.sandpackSelector ?? '.code-sandpack';
-    const customComponent = options.customComponent
-      ? Array.isArray(options.customComponent)
-        ? options.customComponent
-        : [options.customComponent]
-      : [];
-    this.component = [...customComponent, Sandpack];
+  constructor(options: SandpackEmbedderOptions) {
+    this.sandpackSelector = options.sandpackSelector;
+    this.component = { Sandpack, ...options.customComponent };
     this.playgroundClass = options.playgroundClass ?? 'sandpack-container';
     this.sandpackPlaygroundSelector = this.playgroundClass
       .split(' ')
       .map((cn) => `.${cn}`)
       .join('');
     this.theme = options.theme ?? 'dark';
+    this.injectTarget = options.injectTarget;
+    this.injectPosition = options.injectPosition ?? 'after';
   }
 
   /**
@@ -90,18 +88,47 @@ export class SandpackEmbedder {
 
       if (!match) return;
       const [, componentName, rawProps, inner] = match;
-      const Component = this.component.find((component) => component.name === componentName);
+      const Component = this.component[componentName];
       if (!Component) return;
 
       const props = this.parseProps(rawProps);
       const files = this.parseFiles(inner);
 
-      // Create mount container
+      /** Create mount container */
       const mount = document.createElement('div');
       mount.className = this.playgroundClass;
       el.style.display = 'none';
-      el.after(mount);
 
+      /** Find injection target */
+      const target =
+        typeof this.injectTarget === 'string'
+          ? el.closest(this.injectTarget)
+          : typeof this.injectTarget === 'function'
+            ? this.injectTarget(el)
+            : el;
+
+      const parent = target ?? el.parentElement;
+      if (!parent) return;
+
+      /** Inject mount element relative to target */
+      switch (this.injectPosition) {
+        case 'before':
+          parent.before(mount);
+          break;
+        case 'after':
+          parent.after(mount);
+          break;
+        case 'replace':
+          parent.replaceWith(mount);
+          break;
+        case 'inside':
+          parent.appendChild(mount);
+          break;
+        default:
+          parent.after(mount);
+      }
+
+      /** React component wrapper */
       const SandpackApp: React.FC = () => {
         const [theme, setTheme] = useState(this.theme);
 
@@ -113,7 +140,9 @@ export class SandpackEmbedder {
             }
           };
           document.body.addEventListener(EVENTS.THEME_CHANGE, handleThemeChange);
-          return () => document.body.removeEventListener(EVENTS.THEME_CHANGE, handleThemeChange);
+          return () => {
+            document.body.removeEventListener(EVENTS.THEME_CHANGE, handleThemeChange);
+          };
         }, []);
 
         return React.createElement(Component, {
@@ -123,7 +152,7 @@ export class SandpackEmbedder {
         });
       };
 
-      /** Mount React */
+      /** Mount React app */
       const root = createRoot(mount);
       root.render(React.createElement(SandpackApp));
       this.instances.push({ root, mount });
@@ -132,13 +161,9 @@ export class SandpackEmbedder {
 
   /**
    * Parses attribute-style props from a raw HTML-like tag.
-   * Automatically converts JSON-like strings into objects or primitives.
-   * @param raw Raw props string, e.g. `template="react" options='{"editorHeight":"400px"}'`
    */
   private parseProps(raw: string): SandpackProps {
     const props: Record<string, unknown> = {};
-
-    // Split safely by spaces that are outside quotes
     const parts = raw.match(/(?:[^\s'"]+|'[^']*'|"[^"]*")+/g) ?? [];
 
     for (const part of parts) {
@@ -147,7 +172,6 @@ export class SandpackEmbedder {
 
       let value = valueParts.join('=').trim();
 
-      // Remove surrounding quotes
       if (
         (value.startsWith('"') && value.endsWith('"')) ||
         (value.startsWith("'") && value.endsWith("'"))
@@ -155,7 +179,6 @@ export class SandpackEmbedder {
         value = value.slice(1, -1);
       }
 
-      // Try to parse JSON, booleans, or numbers
       try {
         if (value.startsWith('{') || value.startsWith('[')) {
           props[key] = JSON.parse(value);
@@ -176,7 +199,6 @@ export class SandpackEmbedder {
 
   /**
    * Parses code blocks within ``` fences into Sandpack file objects.
-   * @param content Content inside the <Sandpack>...</Sandpack> block
    */
   private parseFiles(content: string): Record<string, SandpackFile> {
     const fileBlocks = [...content.matchAll(/```(\w+)\s+([^\n]+)\n([\s\S]*?)```/g)];
@@ -195,34 +217,21 @@ export class SandpackEmbedder {
     return files;
   }
 
-  /**
-   * Decodes escaped HTML entities like &lt; &gt; &amp; into actual characters.
-   */
   private decodeHTML(html: string): string {
     const txt = document.createElement('textarea');
     txt.innerHTML = html;
     return txt.value;
   }
 
-  /**
-   * Broadcasts a theme change event to all mounted Sandpack instances.
-   * @param theme New theme to apply ("light", "dark", or a custom theme object)
-   */
   updateTheme(theme: SandpackProps['theme']): void {
     document.body.dispatchEvent(new CustomEvent(EVENTS.THEME_CHANGE, { detail: { theme } }));
   }
 
-  /**
-   * Fully re-initializes all embedded Sandpack instances.
-   */
   refresh(): void {
     this.destroy();
     this.load();
   }
 
-  /**
-   * Destroys all mounted Sandpack instances and removes their containers from the DOM.
-   */
   destroy(): void {
     this.instances.forEach(({ root }) => root.unmount());
     this.instances = [];
