@@ -1,26 +1,77 @@
-name: Test Push with GH_PAT
+name: Release
 
 on:
+  push:
+    branches:
+      - master
   workflow_dispatch:
+    inputs:
+      branch:
+        description: "Select branch to publish canary from"
+        required: true
+        default: ""
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+  packages: write
 
 jobs:
-  test-push:
+  release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          fetch-depth: 0
 
-      - name: Make a dummy change
-        run: |
-          echo "Last test at $(date)" > test-push-log.txt
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+          run_install: false
 
-      - name: Commit and push the change
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Run typescript checks
+        run: pnpm type-check
+
+      - name: Run linter checks
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      - name: Setup Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add test-push-log.txt
-          git commit -m "chore(test): test GH_PAT push"
-          git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:v2
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "🚀 Running manual canary release on branch '${{ github.event.inputs.branch }}'"
+            pnpm semantic-release --branches "${{ github.event.inputs.branch }}" --no-ci
+          elif [ "${{ github.ref_name }}" = "master" ]; then
+            echo "📦 Running stable release on master"
+            pnpm semantic-release
+          else
+            echo "⚠️ Skipping release: this branch only supports manual canary trigger"
+          fi
