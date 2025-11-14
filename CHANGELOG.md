@@ -1,3 +1,10 @@
+## [1.6.0](https://github.com/rizalibnu/sandpack-embedder/compare/v1.5.0...v1.6.0) (2025-11-14)
+
+### Features
+
+* add presets for Preview and CodeViewer components, update README and tests for new defaults ([7c61b19](https://github.com/rizalibnu/sandpack-embedder/commit/7c61b191dd06aa7c6471197c6414f1455cb67ce2))
+* change default codeSelector ([b477974](https://github.com/rizalibnu/sandpack-embedder/commit/b477974e1ac7c6e0fc842fc34f49abe26a3b4758))
+
 ## [1.5.0](https://github.com/rizalibnu/sandpack-embedder/compare/v1.4.2...v1.5.0) (2025-11-13)
 
 ### Features
