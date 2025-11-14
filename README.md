@@ -4,6 +4,10 @@
 
 ![Sandpack Embedder](sandpack-embedder-cover.jpg)
 
+Want to see Sandpack Embedder in action?
+
+👉 [Live Demo](https://rizalibnu.dev/i-built-sandpack-embedder-turn-code-snippets-into-live-playgrounds-without-touching-your-cms/)
+
 ## What Sandpack Embedder Does
 
 **Sandpack Embedder** parses these code snippets and converts them into **live Sandpack playgrounds**, without needing to modify your CMS core.
