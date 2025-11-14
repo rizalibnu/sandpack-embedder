@@ -1,3 +1,9 @@
+## [1.6.1](https://github.com/rizalibnu/sandpack-embedder/compare/v1.6.0...v1.6.1) (2025-11-14)
+
+### Bug Fixes
+
+* code-viewer preset component not working correctly ([d821760](https://github.com/rizalibnu/sandpack-embedder/commit/d821760452612b90f019dc221a78722aab419674))
+
 ## [1.6.0](https://github.com/rizalibnu/sandpack-embedder/compare/v1.5.0...v1.6.0) (2025-11-14)
 
 ### Features
