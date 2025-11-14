@@ -71,18 +71,16 @@ export function buildSandpackCode(
  */
 export function buildSandpackBlock(
   props: SandpackProps & { showOriginalCode: boolean },
-  options?: { codeElClass?: string; customComponentName?: string },
+  options?: {
+    customComponentName?: string;
+    wrapper?: (code: string) => string;
+  },
 ): string {
-  const codeElClass = options?.codeElClass || 'code-sandpack';
+  const defaultWrapper = (code: string) => `<pre><code>${code}</code></pre>`;
+  const wrapper = options?.wrapper ?? defaultWrapper;
 
   // Combine everything into escaped code HTML block
   const sandpackCode = buildSandpackCode(props, options);
 
-  return `
-<div class="code-container">
-  <code class="${codeElClass}">
-${escapeCodeForHTML(sandpackCode)}
-  </code>
-</div>
-  `.trim();
+  return wrapper(escapeCodeForHTML(sandpackCode)).trim();
 }

@@ -37,7 +37,7 @@ describe('SandpackEmbedder', () => {
 
   it('supports custom codeSelector', () => {
     const sandpack = new SandpackEmbedder({
-      codeSelector: '.code-js',
+      codeSelector: 'pre > code.code-js',
     });
 
     const container = document.createElement('div');
@@ -56,7 +56,7 @@ describe('SandpackEmbedder', () => {
           },
         },
       },
-      { codeElClass: 'code-js' },
+      { wrapper: (code) => `<pre><code class="code-js">${code}</code></pre>` },
     );
 
     document.body.appendChild(container);
