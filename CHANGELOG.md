@@ -1,3 +1,9 @@
+## [1.6.3](https://github.com/rizalibnu/sandpack-embedder/compare/v1.6.2...v1.6.3) (2025-11-14)
+
+### Documentation
+
+* add live demo ([fb8e53b](https://github.com/rizalibnu/sandpack-embedder/commit/fb8e53babece1e5242f0fdf8f09ac75d755c5e59))
+
 ## [1.6.2](https://github.com/rizalibnu/sandpack-embedder/compare/v1.6.1...v1.6.2) (2025-11-14)
 
 ### Documentation
