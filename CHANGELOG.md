@@ -1,3 +1,9 @@
+## [1.6.2](https://github.com/rizalibnu/sandpack-embedder/compare/v1.6.1...v1.6.2) (2025-11-14)
+
+### Documentation
+
+* add image cover ([3644e80](https://github.com/rizalibnu/sandpack-embedder/commit/3644e801a9b71b5b9b6eacfef240a389051d74c2))
+
 ## [1.6.1](https://github.com/rizalibnu/sandpack-embedder/compare/v1.6.0...v1.6.1) (2025-11-14)
 
 ### Bug Fixes
