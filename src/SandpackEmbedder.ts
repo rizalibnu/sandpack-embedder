@@ -76,7 +76,7 @@ export class SandpackEmbedder {
   private instances: SandpackInstance[] = [];
 
   constructor(options: SandpackEmbedderOptions = {}) {
-    this.codeSelector = options.codeSelector ?? '.code-sandpack';
+    this.codeSelector = options.codeSelector ?? 'pre > code';
     this.components = { sandpack: Sandpack, ...options.customComponents };
     this.playgroundClass = options.playgroundClass ?? 'sandpack-container';
     this.injectTarget = options.injectTarget;

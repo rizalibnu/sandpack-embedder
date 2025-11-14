@@ -77,7 +77,7 @@ You can use `SandpackEmbedder` on **any web page** that includes HTML code block
 ### Simple HTML Integration
 
 ```html
-<code class="code-sandpack">// code snippets</code>
+<pre><code>// code snippets</code></pre>
 <script type="module">
   import { SandpackEmbedder } from "https://esm.sh/@rizalibnu/sandpack-embedder";
 
