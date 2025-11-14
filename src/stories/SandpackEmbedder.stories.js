@@ -157,9 +157,9 @@ export default function App() {
 };
 
 /* -------------------------------------------------
-   Complex Config (Multiple Files)
+   Multiple Files
 -------------------------------------------------- */
-export const WithConfigFiles = () => {
+export const MultipleFiles = () => {
   reset();
   const container = document.createElement('div');
 

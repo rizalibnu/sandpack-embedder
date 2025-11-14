@@ -20,15 +20,16 @@ It:
 ## Example
 
 ### Input (Code snippets from CMS)
+
 ````md
 <sandpack
   template="react"
-  custom-setup="{
-    'dependencies': {
-      'react': '19.2.0',
-      'react-dom': '19.2.0'
+  custom-setup='{
+    "dependencies": {
+      "react": "19.2.0",
+      "react-dom": "19.2.0"
     }
-  }"
+  }'
 >
 ```js /App.js
 export default function App() {
@@ -42,6 +43,7 @@ console.log("I'm  hidden");
 ````
 
 ### Output (after running `SandpackEmbedder`)
+
 💡 **Turns into a live playground!**
 
 ```tsx
@@ -68,6 +70,7 @@ console.log("I'm  hidden");
   }}
 />
 ```
+
 ---
 
 ## Usage
@@ -104,6 +107,7 @@ You can use `SandpackEmbedder` on **any web page** that includes HTML code block
   import { SandpackEmbedder } from "@rizalibnu/sandpack-embedder";
 </script>
 ```
+
 ---
 
 ## Options
@@ -161,6 +165,7 @@ sandpack.refresh();
 ```
 
 Completely clean up:
+
 ```js
 sandpack.destroy();
 ```
@@ -184,7 +189,7 @@ Use them exactly like your `<sandpack>` tag, but simplified.
 // markdown code blocks...
 <preview>
 
-<code-viewer template="react" options="{'viewerHeight': 500}">
+<code-viewer template="react" options='{"viewerHeight": 500}'>
 // markdown code blocks...
 <code-viewer>
 ```
@@ -229,6 +234,7 @@ const sandpack = new SandpackEmbedder({
 
 sandpack.updateTheme("aquaBlue");
 ```
+
 ````md
 <sandpack theme="neoCyan">
   // markdown code blocks...
@@ -238,12 +244,11 @@ sandpack.updateTheme("aquaBlue");
 ### Custom Component Mapping
 
 You can override the `<sandpack>` component or add your own:
+
 ```html
 <script type="importmap">
   {
     "imports": {
-      "react": "https://esm.sh/react@19.2.0",
-      "react-dom": "https://esm.sh/react-dom@19.2.0",
       "@codesandbox/sandpack-react": "https://esm.sh/@codesandbox/sandpack-react@2.20.0",
       "@rizalibnu/sandpack-embedder": "https://esm.sh/@rizalibnu/sandpack-embedder"
     }

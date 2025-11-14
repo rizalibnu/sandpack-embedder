@@ -92,6 +92,8 @@ export class SandpackEmbedder {
     this.showOriginalCode = options.showOriginalCode ?? false;
     this.customThemes = options.customThemes;
     this.theme = options.theme;
+
+    if (options.customComponents) this.validateCustomComponentName(options.customComponents);
   }
 
   /**
@@ -100,7 +102,7 @@ export class SandpackEmbedder {
   load(): this {
     document.querySelectorAll<HTMLElement>(this.codeSelector).forEach((el) => {
       const decoded = this.decodeHTML(el.innerHTML);
-      const match = decoded.match(/<([A-Za-z]+)([^>]*)>([\s\S]*?)<\/\1>/);
+      const match = decoded.match(/<([a-z]+(?:-[a-z0-9]+)*)([^>]*)>([\s\S]*?)<\/\1>/);
 
       if (!match) return;
       const [, componentName, rawProps, inner] = match;
@@ -293,6 +295,38 @@ export class SandpackEmbedder {
     const txt = document.createElement('textarea');
     txt.innerHTML = html;
     return txt.value;
+  }
+
+  /**
+   * Custom component names must:
+   * - Optionally contain a hyphen (-).
+   * - Not start with a number.
+   * - Not contain uppercase letters.
+   * - Not contain certain reserved HTML tag names (e.g., font, color).
+   */
+  private validateCustomComponentName(components: Record<string, Component>) {
+    function isValidComponentName(name: string): boolean {
+      // Must start with a lowercase letter
+      if (!/^[a-z]/.test(name)) {
+        return false;
+      }
+
+      // Must only contain lowercase letters, numbers, and hyphens
+      if (!/^[a-z][a-z0-9-]*$/.test(name)) {
+        return false;
+      }
+
+      // Cannot end with a hyphen
+      if (name.endsWith('-')) {
+        return false;
+      }
+
+      return true;
+    }
+
+    Object.entries(components).forEach(([name]) => {
+      if (!isValidComponentName(name)) throw new Error('Invalid component name');
+    });
   }
 
   /**
