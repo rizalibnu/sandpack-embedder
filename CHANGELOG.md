@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/rizalibnu/sandpack-embedder/compare/v1.4.2...v1.5.0) (2025-11-13)
+
+### Features
+
+* add showOriginalCode option to control visibility of original code snippets ([68400d0](https://github.com/rizalibnu/sandpack-embedder/commit/68400d03fd2650f1bcebc0ab05730c258638a42d))
+
 ## [1.4.2](https://github.com/rizalibnu/sandpack-embedder/compare/v1.4.1...v1.4.2) (2025-11-13)
 
 ### Bug Fixes
