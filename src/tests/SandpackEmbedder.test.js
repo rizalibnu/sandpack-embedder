@@ -32,7 +32,7 @@ describe('SandpackEmbedder', () => {
     document.body.appendChild(container);
     sandpack.load();
 
-    expect(document.querySelector(`.sandpack-container`)).not.toBeNull();
+    expect(document.querySelector(`.sandpack`)).not.toBeNull();
   });
 
   it('supports custom codeSelector', () => {

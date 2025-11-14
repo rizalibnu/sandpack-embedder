@@ -9,6 +9,7 @@ import {
   type SandpackTheme,
   type SandpackPredefinedTheme,
 } from '@codesandbox/sandpack-react';
+import { Preview, CodeViewer } from './presets';
 
 /**
  * Custom event names used by the Sandpack embedder.
@@ -17,20 +18,22 @@ const EVENTS = {
   THEME_CHANGE: 'sandpack-theme-change',
 };
 
+type Component = React.ComponentType<Record<string, unknown>> | SandpackInternal;
+
 /**
  * Options used to configure the SandpackEmbedder instance.
  */
 export interface SandpackEmbedderOptions {
-  /** CSS selector used to find code elements containing escaped <Sandpack> markup. */
+  /** CSS selector used to find code elements containing escaped <Sandpack> markup. Default: 'pre > code' */
   codeSelector?: string;
 
-  /** CSS class name applied to the mount container created for each playground embed. */
+  /** CSS class name applied to the mount container created for each playground embed. Default: 'sandpack' */
   playgroundClass?: string;
 
   /** Custom Sandpack React components (keyed by name, e.g. "Sandpack"). */
-  customComponents?: Record<string, React.ComponentType<SandpackProps>>;
+  customComponents?: Record<string, Component>;
 
-  /** Default theme used when not specified by props. */
+  /** Sandpack initial theme. Default theme by Sandpack Component used when not specified by props. */
   theme?: string | SandpackProps['theme'];
 
   /** Custom Sandpack Theme (keyed by name, e.g. "amethyst").  */
@@ -40,10 +43,12 @@ export interface SandpackEmbedderOptions {
    * Selector or callback that determines where to inject the Sandpack playground.
    * - If string → resolved via `closest(selector)` from code block
    * - If function → return a DOM element relative to the code block
+   *
+   * Default: codeSelector's parentElement
    */
   injectTarget?: string | ((codeEl: HTMLElement) => HTMLElement | null);
 
-  /** Controls where the mount node is injected relative to injectTarget. */
+  /** Controls where the mount node is injected relative to injectTarget. Default: 'after' */
   injectPosition?: 'before' | 'after' | 'replace' | 'inside';
 
   /** Controls visibility of the original code snippet. Default: 'false' */
@@ -57,8 +62,6 @@ interface SandpackInstance {
   root: Root;
   mount: HTMLElement;
 }
-
-type Component = React.ComponentType<SandpackProps> | SandpackInternal;
 
 /**
  * SandpackEmbedder scans the DOM for escaped <Sandpack> blocks,
@@ -77,8 +80,13 @@ export class SandpackEmbedder {
 
   constructor(options: SandpackEmbedderOptions = {}) {
     this.codeSelector = options.codeSelector ?? 'pre > code';
-    this.components = { sandpack: Sandpack, ...options.customComponents };
-    this.playgroundClass = options.playgroundClass ?? 'sandpack-container';
+    this.components = {
+      sandpack: Sandpack,
+      preview: Preview,
+      'code-viewer': CodeViewer,
+      ...options.customComponents,
+    };
+    this.playgroundClass = options.playgroundClass ?? 'sandpack';
     this.injectTarget = options.injectTarget;
     this.injectPosition = options.injectPosition ?? 'after';
     this.showOriginalCode = options.showOriginalCode ?? false;
@@ -192,7 +200,7 @@ export class SandpackEmbedder {
    * Example:
    * <sandpack template="react" custom-setup="{ \"dependencies\": { \"react\": \"19.2.0\" } }">
    */
-  private parseProps(raw: string): SandpackProps & { showOriginalCode: boolean } {
+  private parseProps(raw: string): Record<string, unknown> {
     const props: Record<string, unknown> = {};
 
     // Split attributes safely by spaces outside quotes
@@ -235,7 +243,7 @@ export class SandpackEmbedder {
       }
     }
 
-    return props as unknown as SandpackProps & { showOriginalCode: boolean };
+    return props;
   }
 
   /**

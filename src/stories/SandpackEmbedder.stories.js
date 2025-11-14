@@ -11,17 +11,15 @@ export default {
 /* -------------------------------------------------
    Helper: Reset all sandpack DOMs
 -------------------------------------------------- */
-function resetBeforeStory() {
-  document
-    .querySelectorAll('.sandpack-playground, .sandpack-container')
-    .forEach((el) => el.remove());
+function reset() {
+  document.querySelectorAll('.sandpack').forEach((el) => el.remove());
 }
 
 /* -------------------------------------------------
    Basic Example (React Template + Single File)
 -------------------------------------------------- */
 export const Basic = () => {
-  resetBeforeStory();
+  reset();
   const container = document.createElement('div');
 
   container.innerHTML = buildSandpackBlock({
@@ -56,7 +54,7 @@ export default function App() {
    Dynamic Theme Update
 -------------------------------------------------- */
 export const UpdateTheme = () => {
-  resetBeforeStory();
+  reset();
   const container = document.createElement('div');
 
   container.innerHTML = buildSandpackBlock({
@@ -97,7 +95,7 @@ export default function App() {
    Custom Theme Example (GruvboxDark)
 -------------------------------------------------- */
 export const CustomTheme = () => {
-  resetBeforeStory();
+  reset();
   const container = document.createElement('div');
 
   container.innerHTML = buildSandpackBlock({
@@ -122,7 +120,7 @@ export const CustomTheme = () => {
    Multiple Sandpack Sections
 -------------------------------------------------- */
 export const MultipleSections = () => {
-  resetBeforeStory();
+  reset();
   const container = document.createElement('div');
 
   container.innerHTML = `
@@ -162,7 +160,7 @@ export default function App() {
    Complex Config (Multiple Files)
 -------------------------------------------------- */
 export const WithConfigFiles = () => {
-  resetBeforeStory();
+  reset();
   const container = document.createElement('div');
 
   container.innerHTML = buildSandpackBlock({
@@ -212,7 +210,7 @@ export default Button;
    Custom Sandpack Component
 -------------------------------------------------- */
 export const CustomSandpack = () => {
-  resetBeforeStory();
+  reset();
   const container = document.createElement('div');
 
   container.innerHTML = buildSandpackBlock(
@@ -226,7 +224,7 @@ export const CustomSandpack = () => {
       },
     },
     {
-      customComponentName: 'SandpackEnhanced',
+      componentName: 'sandpack-enhanced',
     },
   );
 
@@ -239,7 +237,7 @@ export const CustomSandpack = () => {
     });
 
   const embedder = new SandpackEmbedder({
-    customComponent: SandpackEnhanced,
+    customComponents: { 'sandpack-enhanced': SandpackEnhanced },
   });
 
   embedder.load();
@@ -251,7 +249,7 @@ export const CustomSandpack = () => {
    Refresh / Destroy Lifecycle Demo
 -------------------------------------------------- */
 export const RefreshAndDestroy = () => {
-  resetBeforeStory();
+  reset();
   const container = document.createElement('div');
 
   container.innerHTML = buildSandpackBlock({

@@ -34,10 +34,10 @@ function camelCaseToKebabCase(str: string): string {
  */
 export function buildSandpackCode(
   props: SandpackProps & { showOriginalCode: boolean },
-  options?: { customComponentName?: string },
+  options?: { componentName?: string },
 ): string {
   const { files = {}, ...rest } = props;
-  const sandpackComponent = options?.customComponentName || 'sandpack';
+  const sandpackComponent = options?.componentName || 'sandpack';
 
   // Build Sandpack attributes (theme, template, options, etc.)
   const attrString = Object.entries(rest)
@@ -72,7 +72,7 @@ export function buildSandpackCode(
 export function buildSandpackBlock(
   props: SandpackProps & { showOriginalCode: boolean },
   options?: {
-    customComponentName?: string;
+    componentName?: string;
     wrapper?: (code: string) => string;
   },
 ): string {

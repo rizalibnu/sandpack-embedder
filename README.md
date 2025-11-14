@@ -112,16 +112,16 @@ You can customize selectors, theme, or even replace the Sandpack component.
 
 ```ts
 export interface SandpackEmbedderOptions {
-  /** CSS selector used to find code elements containing escaped <Sandpack> markup. */
+  /** CSS selector used to find code elements containing escaped <Sandpack> markup. Default: 'pre > code' */
   codeSelector?: string;
 
-  /** CSS class name applied to the mount container created for each playground embed. */
+  /** CSS class name applied to the mount container created for each playground embed. Default: 'sandpack' */
   playgroundClass?: string;
 
   /** Custom Sandpack React components (keyed by name, e.g. "Sandpack"). */
-  customComponents?: Record<string, React.ComponentType<SandpackProps>>;
+  customComponents?: Record<string, Component>;
 
-  /** Default theme used when not specified by props. */
+  /** Sandpack initial theme. Default theme by Sandpack Component used when not specified by props. */
   theme?: string | SandpackProps['theme'];
 
   /** Custom Sandpack Theme (keyed by name, e.g. "amethyst").  */
@@ -131,10 +131,12 @@ export interface SandpackEmbedderOptions {
    * Selector or callback that determines where to inject the Sandpack playground.
    * - If string → resolved via `closest(selector)` from code block
    * - If function → return a DOM element relative to the code block
+   *
+   * Default: codeSelector's parentElement
    */
   injectTarget?: string | ((codeEl: HTMLElement) => HTMLElement | null);
 
-  /** Controls where the mount node is injected relative to injectTarget. */
+  /** Controls where the mount node is injected relative to injectTarget. Default: 'after' */
   injectPosition?: 'before' | 'after' | 'replace' | 'inside';
 
   /** Controls visibility of the original code snippet. Default: 'false' */
@@ -161,6 +163,30 @@ sandpack.refresh();
 Completely clean up:
 ```js
 sandpack.destroy();
+```
+
+---
+
+## Preset Components
+
+Sandpack Embedder includes two built-in presets that let you display only the preview or only the code viewer—perfect for documentation.
+
+These presets wrap your code fences and render a specific Sandpack layout:
+
+`<preview>` → Preview-only (no editor)
+
+`<code-viewer>` → Code Viewer only (readonly, no preview)
+
+Use them exactly like your `<sandpack>` tag, but simplified.
+
+```md
+<preview template="react">
+// markdown code blocks...
+<preview>
+
+<code-viewer template="react" options="{'viewerHeight': 500}">
+// markdown code blocks...
+<code-viewer>
 ```
 
 ---
