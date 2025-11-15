@@ -1,12 +1,12 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    environment: "jsdom",
+    environment: 'jsdom',
     globals: true,
-    setupFiles: "./src/tests/setup.js",
+    setupFiles: './src/tests/setup.js',
     coverage: {
-      reporter: ["text", "html"]
-    }
-  }
+      reporter: ['text', 'html'],
+    },
+  },
 });

@@ -1,12 +1,12 @@
-import { build } from "esbuild";
+import { build } from 'esbuild';
 
 await build({
-  entryPoints: ["src/index.ts"],
+  entryPoints: ['src/index.ts'],
   bundle: true,
-  platform: "browser",
-  target: ["esnext"],
-  outdir: "dist",
-  logLevel: "info",
-  format: "esm",
+  platform: 'browser',
+  target: ['esnext'],
+  outdir: 'dist',
+  logLevel: 'info',
+  format: 'esm',
   packages: 'external',
-})
+});
