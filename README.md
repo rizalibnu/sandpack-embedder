@@ -89,7 +89,7 @@ You can use `SandpackEmbedder` on **any web page** that includes HTML code block
   import { SandpackEmbedder } from "https://esm.sh/@rizalibnu/sandpack-embedder";
 
   const sandpack = new SandpackEmbedder({
-    codeSelector: ".code-sandpack",
+    codeSelector: "pre > code",
     playgroundClass: "sandpack-playground",
   });
 
