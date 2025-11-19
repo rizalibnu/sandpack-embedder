@@ -1,6 +1,6 @@
 {
   "name": "@rizalibnu/sandpack-embedder",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "A universal HTML-based Sandpack runtime — dynamically inject interactive code editors and previews into any HTML document.",
   "keywords": [
     "sandpack",

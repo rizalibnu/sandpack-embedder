@@ -1,3 +1,9 @@
+## [1.6.4](https://github.com/rizalibnu/sandpack-embedder/compare/v1.6.3...v1.6.4) (2025-11-19)
+
+### Documentation
+
+* Change example codeSelector in SandpackEmbedder configuration ([4a27a7c](https://github.com/rizalibnu/sandpack-embedder/commit/4a27a7c037f0847af28ba04478b43097c4ea1d58))
+
 ## [1.6.3](https://github.com/rizalibnu/sandpack-embedder/compare/v1.6.2...v1.6.3) (2025-11-14)
 
 ### Documentation
